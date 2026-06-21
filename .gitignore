@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+.idea/
+.vscode/
+node_modules/
+.next/
+dist/
+build/
+coverage/
+*.user
+*.suo
+*.log
+.env
+.env.local
+appsettings.Development.json

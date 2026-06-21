@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pumperp-postgres
+    environment:
+      POSTGRES_DB: pumperp
+      POSTGRES_USER: pumperp
+      POSTGRES_PASSWORD: pumperp_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pumperp-postgres:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pumperp -d pumperp"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: pumperp-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - pumperp-redis:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: src/backend/PumpErp.Api/Dockerfile
+    container_name: pumperp-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Postgres: Host=postgres;Port=5432;Database=pumperp;Username=pumperp;Password=pumperp_dev_password
+    ports:
+      - "8080:8080"
+
+volumes:
+  pumperp-postgres:
+  pumperp-redis:

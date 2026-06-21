@@ -1,0 +1,15 @@
+[build]
+  publish = "apps/preview"
+  command = ""
+
+[[redirects]]
+  from = "/"
+  to = "/run.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

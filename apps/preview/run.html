@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PumpERP Cloud</title>
+    <style>
+      :root {
+        --bg: #f4f6f8;
+        --panel: #ffffff;
+        --text: #172026;
+        --muted: #667085;
+        --line: #d9dee5;
+        --brand: #1769aa;
+        --success: #14845c;
+        --warning: #b7791f;
+        --danger: #b42318;
+      }
+      [data-theme="dark"] {
+        --bg: #101418;
+        --panel: #181f26;
+        --text: #edf2f7;
+        --muted: #aab4c0;
+        --line: #2d3742;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      button, input, select { font: inherit; }
+      .sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 260px;
+        border-right: 1px solid var(--line);
+        background: var(--panel);
+        padding: 20px 14px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 26px;
+      }
+      .brand-mark {
+        display: grid;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--text);
+        color: var(--bg);
+        font-weight: 800;
+      }
+      .brand span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+      }
+      .nav-button {
+        display: flex;
+        width: 100%;
+        height: 42px;
+        align-items: center;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        margin-bottom: 3px;
+        padding: 0 12px;
+      }
+      .nav-button.active, .nav-button:hover {
+        background: color-mix(in srgb, var(--brand) 12%, transparent);
+        color: var(--text);
+      }
+      .shell { margin-left: 260px; min-height: 100vh; }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        min-height: 74px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--panel);
+        padding: 12px 28px;
+      }
+      h1, h2, h3, p { margin: 0; }
+      h1 { font-size: 24px; letter-spacing: 0; }
+      .topbar p {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .actions { display: flex; gap: 8px; }
+      .button, .primary-button, .danger-button, .send-button {
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--panel);
+        color: var(--text);
+        cursor: pointer;
+        padding: 0 12px;
+      }
+      .primary-button {
+        border-color: var(--brand);
+        background: var(--brand);
+        color: white;
+      }
+      .danger-button {
+        border-color: color-mix(in srgb, var(--danger) 35%, var(--line));
+        color: var(--danger);
+      }
+      .send-button {
+        border-color: color-mix(in srgb, var(--success) 45%, var(--line));
+        color: var(--success);
+      }
+      .view { padding: 24px 28px 38px; }
+      .metric-grid, .module-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .content-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 16px;
+        margin-top: 16px;
+      }
+      .card, .metric {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        overflow: hidden;
+      }
+      .metric { min-height: 126px; padding: 16px; }
+      .metric span, .label {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .metric strong {
+        display: block;
+        margin-top: 20px;
+        font-size: 25px;
+      }
+      .card-header {
+        display: flex;
+        min-height: 52px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+        padding: 0 16px;
+      }
+      .card-body { padding: 16px; }
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .form-grid input, .form-grid select, .form-grid textarea, .search {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--panel);
+        color: var(--text);
+        outline: 0;
+        padding: 0 10px;
+      }
+      .form-grid input, .form-grid select { height: 40px; }
+      .form-grid textarea {
+        min-height: 150px;
+        grid-column: 1 / -1;
+        padding: 10px;
+        resize: vertical;
+      }
+      .search { height: 44px; }
+      .slip-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 16px;
+      }
+      .slip-preview {
+        min-height: 360px;
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--panel) 92%, var(--bg));
+        padding: 18px;
+        white-space: pre-wrap;
+        line-height: 1.55;
+      }
+      .slip-paper {
+        direction: rtl;
+        max-width: 520px;
+        margin: 0 auto;
+        border: 5px solid #062a6f;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #071b45;
+        padding: 14px;
+        font-family: Arial, "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", sans-serif;
+      }
+      .slip-brand {
+        display: grid;
+        grid-template-columns: 80px 1fr;
+        gap: 12px;
+        align-items: center;
+        border-bottom: 6px solid #0b7a3b;
+        padding-bottom: 10px;
+      }
+      .slip-logo {
+        display: grid;
+        width: 72px;
+        height: 72px;
+        place-items: center;
+        border: 3px solid #0b7a3b;
+        border-radius: 50%;
+        color: #0b7a3b;
+        font-weight: 800;
+      }
+      .slip-name {
+        color: #cf1018;
+        font-size: 34px;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .slip-subtitle {
+        display: inline-block;
+        margin-top: 8px;
+        border-radius: 999px;
+        background: #087238;
+        color: white;
+        padding: 6px 18px;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .slip-line-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 12px;
+        direction: rtl;
+      }
+      .slip-field {
+        border-bottom: 2px solid #0b1f55;
+        padding: 7px 6px;
+        min-height: 36px;
+        font-weight: 700;
+      }
+      .slip-party-box {
+        margin-top: 12px;
+        border: 2px solid #0b7a3b;
+        border-radius: 12px;
+        padding: 10px;
+      }
+      .slip-table {
+        width: 100%;
+        margin-top: 12px;
+        border: 2px solid #062a6f;
+        border-radius: 10px;
+        overflow: hidden;
+        direction: rtl;
+      }
+      .slip-table th {
+        background: #062a6f;
+        color: #ffffff;
+        font-size: 15px;
+      }
+      .slip-table td, .slip-table th {
+        border: 1px solid #062a6f;
+        padding: 8px;
+        text-align: center;
+      }
+      .slip-total {
+        display: grid;
+        grid-template-columns: 1fr 150px;
+        gap: 8px;
+        align-items: center;
+        margin-top: 8px;
+        border: 1px solid #d9dee5;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .slip-total strong {
+        padding: 8px 10px;
+      }
+      .slip-total span {
+        padding: 8px 10px;
+        background: #eef8f0;
+        color: #071b45;
+        font-weight: 800;
+      }
+      .slip-total.received span { background: #eaf3ff; }
+      .slip-total.balance span { background: #ffecec; color: #9f1111; }
+      .slip-methods, .slip-signatures, .slip-footer {
+        margin-top: 10px;
+        border: 1px solid #d9dee5;
+        border-radius: 8px;
+        padding: 9px;
+      }
+      .slip-methods {
+        display: flex;
+        justify-content: space-around;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .slip-signatures {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .slip-footer {
+        display: flex;
+        justify-content: space-between;
+        background: #062a6f;
+        color: white;
+        font-weight: 800;
+      }
+      .template-slip {
+        position: relative;
+        max-width: 520px;
+        margin: 0 auto;
+        border: 4px solid #062a6f;
+        background: #ffffff;
+        color: #071b45;
+        font-family: Arial, "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", sans-serif;
+      }
+      .template-slip img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .tpl-field {
+        position: absolute;
+        direction: rtl;
+        color: #061947;
+        font-weight: 800;
+        line-height: 1.2;
+        text-align: center;
+        overflow: hidden;
+      }
+      .tpl-date { top: 27.9%; left: 50%; width: 22%; font-size: 15px; }
+      .tpl-bill { top: 27.9%; left: 16%; width: 24%; font-size: 15px; }
+      .tpl-name { top: 35.3%; left: 15%; width: 67%; font-size: 17px; }
+      .tpl-phone { top: 40.0%; left: 15%; width: 67%; font-size: 17px; }
+      .tpl-model { top: 48.2%; left: 30%; width: 30%; font-size: 14px; }
+      .tpl-qty { top: 48.2%; left: 51%; width: 10%; font-size: 14px; }
+      .tpl-price { top: 48.2%; left: 61%; width: 17%; font-size: 14px; }
+      .tpl-line-total { top: 48.2%; left: 77%; width: 15%; font-size: 14px; }
+      .tpl-total { top: 70.4%; left: 13%; width: 44%; font-size: 17px; }
+      .tpl-paid { top: 75.4%; left: 13%; width: 44%; font-size: 17px; }
+      .tpl-balance { top: 80.5%; left: 13%; width: 44%; font-size: 17px; color: #9f1111; }
+      .tpl-method { top: 85.2%; left: 21%; width: 55%; font-size: 13px; }
+      .tpl-shop-sign { top: 91.8%; left: 11%; width: 30%; font-size: 13px; }
+      .tpl-company-sign { top: 91.8%; left: 57%; width: 30%; font-size: 13px; }
+      .profile-grid, .report-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+      }
+      .mini {
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 12px;
+      }
+      .mini strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 20px;
+      }
+      table { width: 100%; border-collapse: collapse; }
+      th, td {
+        border-bottom: 1px solid var(--line);
+        padding: 12px 14px;
+        text-align: left;
+        white-space: nowrap;
+      }
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+      }
+      .status {
+        display: inline-flex;
+        min-height: 26px;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0 9px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .ok { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+      .warn { background: color-mix(in srgb, var(--warning) 15%, transparent); color: var(--warning); }
+      .bad { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        padding: 12px 14px;
+      }
+      @media (max-width: 980px) {
+        .sidebar { position: static; width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+        .shell { margin-left: 0; }
+        .metric-grid, .module-grid, .content-grid, .profile-grid, .report-grid, .form-grid, .slip-layout { grid-template-columns: 1fr; }
+        .topbar { align-items: flex-start; flex-direction: column; padding: 16px; }
+        .view { padding: 16px; }
+        th, td { white-space: normal; }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">PE</div>
+        <div><strong>PumpERP</strong><span>Cloud Khata</span></div>
+      </div>
+      <nav id="nav"></nav>
+    </aside>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1 id="page-title">Dashboard</h1>
+          <p id="page-subtitle"></p>
+        </div>
+        <div class="actions">
+          <button id="sync-button" class="button">Sync</button>
+          <button id="theme-button" class="button">Mode</button>
+        </div>
+      </header>
+      <section id="view" class="view"></section>
+    </main>
+
+    <script>
+      const money = new Intl.NumberFormat("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 0 });
+      const today = new Date().toISOString().slice(0, 10);
+      const state = {
+        page: "dashboard",
+        slipTemplate: "PumpERP Cloud Khata\nDate: {date}\nSlip No: {slip}\nType: {partyType}\nName: {name}\nPhone: {phone}\nBill Amount: {bill}\nPaid Amount: {paid}\nBalance: {balance}\n\nThank you.\nPumpERP"
+      };
+      const data = {
+        customers: [
+          { code: "CUS-1001", name: "Ali Traders", mobile: "0300-1122334", city: "Lahore", sales: 245000, paid: 159000, balance: 86000, pumps: 7, lastPayment: "2026-06-18" },
+          { code: "CUS-1002", name: "Mian Pumps", mobile: "0312-7788990", city: "Gujranwala", sales: 98000, paid: 79500, balance: 18500, pumps: 3, lastPayment: "2026-06-20" },
+          { code: "CUS-1003", name: "Hassan Electric", mobile: "0321-4455667", city: "Faisalabad", sales: 174000, paid: 130000, balance: 44000, pumps: 5, lastPayment: "2026-06-16" }
+        ],
+        suppliers: [
+          { name: "Prime Motors Supply", contact: "0301-5544332", city: "Lahore", purchases: 920000, paid: 620000, balance: 300000 },
+          { name: "Bearing House", contact: "0302-6677889", city: "Faisalabad", purchases: 380000, paid: 280000, balance: 100000 },
+          { name: "Metal Works", contact: "0303-1122445", city: "Gujranwala", purchases: 240000, paid: 0, balance: 240000 }
+        ],
+        inventory: [
+          { sku: "MTR-001", name: "1HP Motor", category: "Motors", stock: 22, threshold: 8, value: 770000 },
+          { sku: "BRG-6204", name: "6204 Bearing", category: "Bearings", stock: 140, threshold: 50, value: 98000 },
+          { sku: "IMP-2IN", name: "2 inch Impeller", category: "Impellers", stock: 11, threshold: 15, value: 66000 },
+          { sku: "CAS-STEEL", name: "Steel Casing", category: "Casings", stock: 7, threshold: 10, value: 126000 }
+        ],
+        pumps: [
+          { code: "PMP-1001", name: "1HP Water Pump", customer: "Ali Traders", status: "Ready", cost: 18500, sale: 26000 },
+          { code: "PMP-1002", name: "Repair Motor Pump", customer: "Mian Pumps", status: "Under Work", cost: 6200, sale: 11000 },
+          { code: "PMP-1003", name: "2HP New Assembly", customer: "Hassan Electric", status: "Pending", cost: 32000, sale: 45500 }
+        ],
+        sales: [
+          { invoice: "INV-3901", customer: "Ali Traders", total: 10000, paid: 7000 },
+          { invoice: "INV-3902", customer: "Mian Pumps", total: 18500, paid: 0 },
+          { invoice: "INV-3903", customer: "Hassan Electric", total: 44000, paid: 0 }
+        ],
+        payments: [
+          { receipt: "RCP-9011", customer: "Ali Traders", method: "Cash", amount: 5000, date: "2026-06-19" },
+          { receipt: "RCP-9012", customer: "Ali Traders", method: "JazzCash", amount: 2000, date: "2026-06-20" },
+          { receipt: "RCP-9013", customer: "Mian Pumps", method: "Bank Transfer", amount: 12000, date: "2026-06-20" }
+        ]
+      };
+      const pages = [
+        ["dashboard", "Dashboard"],
+        ["customers", "Customers"],
+        ["suppliers", "Suppliers"],
+        ["inventory", "Inventory"],
+        ["pumps", "Pumps"],
+        ["sales", "Sales"],
+        ["payments", "Payments"],
+        ["slips", "Slips"],
+        ["reports", "Reports"],
+        ["settings", "Settings"]
+      ];
+      const subtitles = {
+        dashboard: "Live totals, customer search, stock health, and payment position.",
+        customers: "Add, remove, search, and track customer khata balances.",
+        suppliers: "Add, remove, and track supplier purchases and payable amounts.",
+        inventory: "Add, remove, and monitor stock, low-stock alerts, and valuation.",
+        pumps: "Add, remove, and track production status, cost, sale price, and profit.",
+        sales: "Add, remove, and track invoices with automatic remaining balance.",
+        payments: "Add and remove receipts across cash, bank transfer, Easypaisa, and JazzCash.",
+        slips: "Create bill slips, preview them, and send to customer or supplier number.",
+        reports: "Live report cards update from the current data.",
+        settings: "Security, roles, sync, backup, and device controls."
+      };
+      const config = {
+        customers: {
+          title: "Customers",
+          collection: "customers",
+          fields: [
+            ["code", "Code", "text", "CUS-" + nextNumber(data.customers.length + 1)],
+            ["name", "Name", "text", ""],
+            ["mobile", "Mobile", "text", ""],
+            ["city", "City", "text", ""],
+            ["sales", "Sales", "number", "0"],
+            ["paid", "Paid", "number", "0"],
+            ["balance", "Balance", "number", "0"],
+            ["pumps", "Pumps", "number", "0"]
+          ],
+          headers: ["Code", "Name", "Mobile", "City", "Sales", "Paid", "Balance", "Pumps"],
+          row: item => [item.code, item.name, item.mobile, item.city, money.format(num(item.sales)), money.format(num(item.paid)), money.format(num(item.balance)), num(item.pumps)]
+        },
+        suppliers: {
+          title: "Suppliers",
+          collection: "suppliers",
+          fields: [["name", "Name", "text", ""], ["contact", "Contact", "text", ""], ["city", "City", "text", ""], ["purchases", "Purchases", "number", "0"], ["paid", "Paid", "number", "0"], ["balance", "Payable", "number", "0"]],
+          headers: ["Name", "Contact", "City", "Purchases", "Paid", "Payable"],
+          row: item => [item.name, item.contact, item.city, money.format(num(item.purchases)), money.format(num(item.paid)), money.format(num(item.balance))]
+        },
+        inventory: {
+          title: "Inventory",
+          collection: "inventory",
+          fields: [["sku", "SKU", "text", "SKU-" + nextNumber(data.inventory.length + 1)], ["name", "Name", "text", ""], ["category", "Category", "text", "Accessories"], ["stock", "Stock", "number", "0"], ["threshold", "Low Alert", "number", "5"], ["value", "Value", "number", "0"]],
+          headers: ["SKU", "Name", "Category", "Stock", "Alert", "Value"],
+          row: item => [item.sku, item.name, item.category, num(item.stock), num(item.stock) <= num(item.threshold) ? badge("Low", "bad") : badge("OK", "ok"), money.format(num(item.value))]
+        },
+        pumps: {
+          title: "Pump Production",
+          collection: "pumps",
+          fields: [["code", "Code", "text", "PMP-" + nextNumber(data.pumps.length + 1)], ["name", "Name", "text", ""], ["customer", "Customer", "text", ""], ["status", "Status", "select", "Pending", ["Pending", "Under Work", "Ready", "Delivered"]], ["cost", "Cost", "number", "0"], ["sale", "Sale", "number", "0"]],
+          headers: ["Code", "Name", "Customer", "Status", "Cost", "Sale", "Profit"],
+          row: item => [item.code, item.name, item.customer, statusBadge(item.status), money.format(num(item.cost)), money.format(num(item.sale)), money.format(num(item.sale) - num(item.cost))]
+        },
+        sales: {
+          title: "Sales",
+          collection: "sales",
+          fields: [["invoice", "Invoice", "text", "INV-" + nextNumber(data.sales.length + 1)], ["customer", "Customer", "text", ""], ["total", "Total", "number", "0"], ["paid", "Paid", "number", "0"]],
+          headers: ["Invoice", "Customer", "Total", "Paid", "Balance"],
+          row: item => [item.invoice, item.customer, money.format(num(item.total)), money.format(num(item.paid)), money.format(Math.max(0, num(item.total) - num(item.paid)))]
+        },
+        payments: {
+          title: "Payments",
+          collection: "payments",
+          fields: [["receipt", "Receipt", "text", "RCP-" + nextNumber(data.payments.length + 1)], ["customer", "Customer", "text", ""], ["method", "Method", "select", "Cash", ["Cash", "Bank Transfer", "Easypaisa", "JazzCash"]], ["amount", "Amount", "number", "0"], ["date", "Date", "date", today]],
+          headers: ["Receipt", "Customer", "Method", "Amount", "Date"],
+          row: item => [item.receipt, item.customer, item.method, money.format(num(item.amount)), item.date]
+        }
+      };
+
+      const nav = document.querySelector("#nav");
+      const view = document.querySelector("#view");
+      const title = document.querySelector("#page-title");
+      const subtitle = document.querySelector("#page-subtitle");
+
+      nav.innerHTML = pages.map(([key, label]) => `<button class="nav-button" data-page="${key}">${label}</button>`).join("");
+      nav.addEventListener("click", event => {
+        const button = event.target.closest("[data-page]");
+        if (!button) return;
+        state.page = button.dataset.page;
+        render();
+      });
+      document.querySelector("#theme-button").addEventListener("click", () => {
+        document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "" : "dark";
+      });
+      document.querySelector("#sync-button").addEventListener("click", () => toast("Synced successfully"));
+
+      function render() {
+        document.querySelectorAll(".nav-button").forEach(button => button.classList.toggle("active", button.dataset.page === state.page));
+        title.textContent = pages.find(([key]) => key === state.page)[1];
+        subtitle.textContent = subtitles[state.page];
+        if (state.page === "dashboard") view.innerHTML = renderDashboard();
+        else if (state.page === "slips") view.innerHTML = renderSlips();
+        else if (state.page === "reports") view.innerHTML = renderReports();
+        else if (state.page === "settings") view.innerHTML = renderSettings();
+        else view.innerHTML = renderCrud(config[state.page]);
+        wireEvents();
+      }
+
+      function renderDashboard() {
+        const summary = getSummary();
+        const firstCustomer = data.customers[0] ?? emptyCustomer();
+        return `
+          <section class="metric-grid">
+            ${metric("Customers", data.customers.length)}
+            ${metric("Receivable", money.format(summary.receivable))}
+            ${metric("Payable", money.format(summary.payable))}
+            ${metric("Profit", money.format(summary.profit))}
+          </section>
+          <section class="content-grid">
+            <div class="card">
+              <div class="card-header"><h2>Smart Customer Search</h2><span class="status ok">Working</span></div>
+              <div class="card-body">
+                <input id="customer-search" class="search" placeholder="Search by name, mobile, or city">
+                <div id="customer-profile" class="profile-grid">${customerProfile(firstCustomer)}</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h2>Operations</h2>${badge(summary.pending + " pending", "warn")}</div>
+              <div class="card-body">
+                ${mini("Ready Pumps", summary.ready)}
+                ${mini("Inventory Value", money.format(summary.inventoryValue))}
+                ${mini("Low Stock Items", summary.lowStock)}
+                ${mini("Open Invoices", summary.openInvoices)}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderCrud(def) {
+        return `
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-header"><h2>Add ${escapeHtml(def.title)}</h2><span class="label">Records: ${data[def.collection].length}</span></div>
+            <div class="card-body">
+              <form class="form-grid" data-add="${def.collection}">
+                ${def.fields.map(fieldInput).join("")}
+                <button class="primary-button" type="submit">Add</button>
+              </form>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h2>${escapeHtml(def.title)}</h2><button class="button" type="button" data-export="${def.collection}">Export</button></div>
+            <div style="overflow:auto">
+              <table>
+                <thead><tr>${def.headers.map(header => `<th>${escapeHtml(header)}</th>`).join("")}<th>Slip</th><th>Action</th></tr></thead>
+                <tbody>
+                  ${data[def.collection].map((item, index) => `<tr>${def.row(item).map(cell => `<td>${cell}</td>`).join("")}<td>${slipAction(def.collection, index)}</td><td><button class="danger-button" data-remove="${def.collection}" data-index="${index}">Remove</button></td></tr>`).join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderSlips() {
+        const parties = slipParties();
+        const selected = state.selectedSlip ?? parties[0] ?? emptySlipParty();
+        return `
+          <section class="slip-layout">
+            <div class="card">
+              <div class="card-header"><h2>Slip Generator</h2><span class="status ok">Send Ready</span></div>
+              <div class="card-body">
+                <form class="form-grid" id="slip-form">
+                  <select id="slip-party" aria-label="Customer or supplier">
+                    ${parties.map((party, index) => `<option value="${index}" ${party.name === selected.name && party.partyType === selected.partyType ? "selected" : ""}>${escapeHtml(party.partyType)} - ${escapeHtml(party.name)} (${escapeHtml(party.phone)})</option>`).join("")}
+                  </select>
+                  <input id="slip-bill" type="number" value="${num(selected.bill)}" placeholder="Bill amount">
+                  <input id="slip-paid" type="number" value="${num(selected.paid)}" placeholder="Paid amount">
+                  <input id="slip-balance" type="number" value="${num(selected.balance)}" placeholder="Balance">
+                  <select id="slip-method" aria-label="Payment method">
+                    ${["Cash", "Bank", "Easypaisa", "JazzCash"].map(method => `<option ${method === selected.method ? "selected" : ""}>${method}</option>`).join("")}
+                  </select>
+                  <textarea id="slip-template" aria-label="Slip message template">${escapeHtml(state.slipTemplate)}</textarea>
+                </form>
+                <div class="actions" style="margin-top:12px;flex-wrap:wrap">
+                  <button class="primary-button" data-update-slip>Update Slip</button>
+                  <button class="send-button" data-send-whatsapp>Send WhatsApp</button>
+                  <button class="button" data-send-sms>Send SMS</button>
+                  <button class="button" data-print-slip>Print Slip</button>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h2>Slip Preview</h2><span class="label">Sajjad Pumps style</span></div>
+              <div class="card-body">
+                <div id="slip-preview">${renderSlipHtml(selected)}</div>
+              </div>
+            </div>
+          </section>
+          <div class="card" style="margin-top:16px">
+            <div class="card-header"><h2>Customer / Supplier Bills</h2><span class="label">Click Create Slip</span></div>
+            <div style="overflow:auto">
+              <table>
+                <thead><tr><th>Name</th><th>Phone</th><th>Type</th><th>Bill</th><th>Balance</th><th>Action</th></tr></thead>
+                <tbody>${parties.map((party, index) => `<tr><td>${escapeHtml(party.name)}</td><td>${escapeHtml(party.phone)}</td><td>${escapeHtml(party.partyType)}</td><td>${money.format(num(party.bill))}</td><td>${money.format(num(party.balance))}</td><td><button class="send-button" data-slip-party-index="${index}">Create Slip</button></td></tr>`).join("")}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderReports() {
+        const summary = getSummary();
+        return `<section class="report-grid">
+          ${miniCard("Sales Report", money.format(summary.sales), "Current sales total")}
+          ${miniCard("Purchase Report", money.format(summary.purchases), "Supplier purchase total")}
+          ${miniCard("Profit & Loss", money.format(summary.profit), "Pump sale profit")}
+          ${miniCard("Customer Statement", money.format(summary.receivable), "Customer receivable")}
+          ${miniCard("Supplier Statement", money.format(summary.payable), "Supplier payable")}
+          ${miniCard("Inventory Report", money.format(summary.inventoryValue), "Stock valuation")}
+        </section>`;
+      }
+
+      function renderSettings() {
+        return `<section class="module-grid">
+          ${miniCard("Authentication", "JWT + Refresh", "Sessions and device tracking")}
+          ${miniCard("Roles", "Owner / Accountant / Staff", "Permission-ready")}
+          ${miniCard("Backup", "Daily", "Cloud restore workflow")}
+          ${miniCard("Offline Sync", "Queued", "Mobile conflict-ready design")}
+        </section>`;
+      }
+
+      function wireEvents() {
+        const search = document.querySelector("#customer-search");
+        if (search) {
+          search.addEventListener("input", () => {
+            const term = search.value.toLowerCase();
+            const found = data.customers.find(customer => [customer.name, customer.mobile, customer.city].some(value => String(value).toLowerCase().includes(term))) ?? data.customers[0] ?? emptyCustomer();
+            document.querySelector("#customer-profile").innerHTML = customerProfile(found);
+          });
+        }
+        document.querySelectorAll("[data-add]").forEach(form => {
+          form.addEventListener("submit", event => {
+            event.preventDefault();
+            const collection = form.dataset.add;
+            const def = Object.values(config).find(item => item.collection === collection);
+            const item = {};
+            def.fields.forEach(([key, , type]) => {
+              const input = form.elements[key];
+              item[key] = type === "number" ? num(input.value) : input.value.trim();
+            });
+            applyBusinessRules(collection, item);
+            data[collection].push(item);
+            toast("Added successfully");
+            render();
+          });
+        });
+        document.querySelectorAll("[data-remove]").forEach(button => {
+          button.addEventListener("click", () => {
+            const collection = button.dataset.remove;
+            const index = Number(button.dataset.index);
+            data[collection].splice(index, 1);
+            toast("Removed successfully");
+            render();
+          });
+        });
+        document.querySelectorAll("[data-export]").forEach(button => {
+          button.addEventListener("click", () => toast("Export ready for " + button.dataset.export));
+        });
+        document.querySelectorAll("[data-create-slip]").forEach(button => {
+          button.addEventListener("click", () => {
+            state.selectedSlip = partyFromRecord(button.dataset.createSlip, Number(button.dataset.index));
+            state.page = "slips";
+            render();
+          });
+        });
+        document.querySelectorAll("[data-slip-party-index]").forEach(button => {
+          button.addEventListener("click", () => {
+            state.selectedSlip = slipParties()[Number(button.dataset.slipPartyIndex)] ?? emptySlipParty();
+            render();
+          });
+        });
+        const slipParty = document.querySelector("#slip-party");
+        if (slipParty) {
+          const fillSelectedPartyAmounts = () => {
+            const party = slipParties()[Number(slipParty.value)] ?? emptySlipParty();
+            document.querySelector("#slip-bill").value = num(party.bill);
+            document.querySelector("#slip-paid").value = num(party.paid);
+            document.querySelector("#slip-balance").value = num(party.balance);
+            document.querySelector("#slip-method").value = party.method || "Cash";
+          };
+          const syncSlip = () => {
+            const parties = slipParties();
+            const party = parties[Number(slipParty.value)] ?? state.selectedSlip ?? emptySlipParty();
+            state.selectedSlip = {
+              ...party,
+              bill: num(document.querySelector("#slip-bill").value),
+              paid: num(document.querySelector("#slip-paid").value),
+              balance: num(document.querySelector("#slip-balance").value),
+              method: document.querySelector("#slip-method").value
+            };
+            state.slipTemplate = document.querySelector("#slip-template").value;
+            document.querySelector("#slip-preview").innerHTML = renderSlipHtml(state.selectedSlip);
+          };
+          slipParty.addEventListener("change", () => {
+            fillSelectedPartyAmounts();
+            syncSlip();
+          });
+          ["change", "input"].forEach(eventName => {
+            document.querySelector("#slip-form").addEventListener(eventName, syncSlip);
+          });
+          document.querySelector("[data-update-slip]").addEventListener("click", () => {
+            syncSlip();
+            toast("Slip updated");
+          });
+          document.querySelector("[data-send-whatsapp]").addEventListener("click", () => {
+            syncSlip();
+            sendSlip("whatsapp", state.selectedSlip);
+          });
+          document.querySelector("[data-send-sms]").addEventListener("click", () => {
+            syncSlip();
+            sendSlip("sms", state.selectedSlip);
+          });
+          document.querySelector("[data-print-slip]").addEventListener("click", () => window.print());
+        }
+      }
+
+      function applyBusinessRules(collection, item) {
+        if (collection === "sales") {
+          item.paid = Math.min(num(item.paid), num(item.total));
+        }
+        if (collection === "customers") {
+          item.lastPayment = today;
+        }
+      }
+
+      function slipAction(collection, index) {
+        if (!["customers", "suppliers", "sales", "payments"].includes(collection)) return "-";
+        return `<button class="send-button" data-create-slip="${collection}" data-index="${index}">Slip</button>`;
+      }
+
+      function slipParties() {
+        const customers = data.customers.map(customer => ({
+          partyType: "Customer",
+          name: customer.name,
+          phone: customer.mobile,
+          bill: customer.sales,
+          paid: customer.paid,
+          balance: customer.balance,
+          method: "Cash",
+          itemName: "Pump / Repair Bill"
+        }));
+        const suppliers = data.suppliers.map(supplier => ({
+          partyType: "Supplier",
+          name: supplier.name,
+          phone: supplier.contact,
+          bill: supplier.purchases,
+          paid: supplier.paid,
+          balance: supplier.balance,
+          method: "Bank",
+          itemName: "Supplier Purchase Bill"
+        }));
+        return [...customers, ...suppliers];
+      }
+
+      function partyFromRecord(collection, index) {
+        const item = data[collection]?.[index];
+        if (!item) return emptySlipParty();
+        if (collection === "customers") {
+          return { partyType: "Customer", name: item.name, phone: item.mobile, bill: item.sales, paid: item.paid, balance: item.balance, method: "Cash", itemName: "Pump / Repair Bill" };
+        }
+        if (collection === "suppliers") {
+          return { partyType: "Supplier", name: item.name, phone: item.contact, bill: item.purchases, paid: item.paid, balance: item.balance, method: "Bank", itemName: "Supplier Purchase Bill" };
+        }
+        if (collection === "sales") {
+          const customer = data.customers.find(record => record.name === item.customer) ?? emptyCustomer();
+          return { partyType: "Customer", name: item.customer, phone: customer.mobile ?? "", bill: item.total, paid: item.paid, balance: Math.max(0, num(item.total) - num(item.paid)), method: "Cash", itemName: item.invoice };
+        }
+        if (collection === "payments") {
+          const customer = data.customers.find(record => record.name === item.customer) ?? emptyCustomer();
+          return { partyType: "Customer", name: item.customer, phone: customer.mobile ?? "", bill: item.amount, paid: item.amount, balance: customer.balance ?? 0, method: item.method, itemName: item.receipt };
+        }
+        return emptySlipParty();
+      }
+
+      function renderSlipHtml(party) {
+        const slip = slipViewModel(party);
+        return `
+          <article class="template-slip">
+            <img src="assets/sajjad-pumps-slip.jpeg" alt="Sajjad Pumps slip template">
+            <div class="tpl-field tpl-date">${escapeHtml(slip.date)}</div>
+            <div class="tpl-field tpl-bill">${escapeHtml(slip.slip)}</div>
+            <div class="tpl-field tpl-name">${escapeHtml(slip.name)}</div>
+            <div class="tpl-field tpl-phone">${escapeHtml(slip.phone)}</div>
+            <div class="tpl-field tpl-model">${escapeHtml(slip.itemName)}</div>
+            <div class="tpl-field tpl-qty">1</div>
+            <div class="tpl-field tpl-price">${money.format(slip.bill)}</div>
+            <div class="tpl-field tpl-line-total">${money.format(slip.bill)}</div>
+            <div class="tpl-field tpl-total">${money.format(slip.bill)}</div>
+            <div class="tpl-field tpl-paid">${money.format(slip.paid)}</div>
+            <div class="tpl-field tpl-balance">${money.format(slip.balance)}</div>
+            <div class="tpl-field tpl-method">${escapeHtml(paymentMethodUrdu(slip.method))}</div>
+            <div class="tpl-field tpl-shop-sign">${escapeHtml(slip.name)}</div>
+            <div class="tpl-field tpl-company-sign">سجاد پمپس</div>
+          </article>
+        `;
+      }
+
+      function renderSlipText(party) {
+        const slip = slipViewModel(party);
+        return state.slipTemplate
+          .replaceAll("{date}", slip.date)
+          .replaceAll("{slip}", slip.slip)
+          .replaceAll("{partyType}", slip.partyType)
+          .replaceAll("{name}", slip.name)
+          .replaceAll("{phone}", slip.phone)
+          .replaceAll("{bill}", money.format(slip.bill))
+          .replaceAll("{paid}", money.format(slip.paid))
+          .replaceAll("{balance}", money.format(slip.balance))
+          .replaceAll("{method}", slip.method)
+          .replaceAll("{item}", slip.itemName);
+      }
+
+      function slipViewModel(party) {
+        const safeParty = party ?? emptySlipParty();
+        return {
+          partyType: safeParty.partyType || "Customer",
+          name: safeParty.name || "-",
+          phone: safeParty.phone || "",
+          bill: num(safeParty.bill),
+          paid: num(safeParty.paid),
+          balance: num(safeParty.balance),
+          method: safeParty.method || "Cash",
+          itemName: safeParty.itemName || "Pump / Repair Bill",
+          date: today,
+          slip: "SLP-" + Date.now().toString().slice(-6)
+        };
+      }
+
+      function sendSlip(mode, party) {
+        const phone = normalizePhone(party.phone);
+        if (!phone) {
+          toast("Phone number missing");
+          return;
+        }
+        const message = encodeURIComponent(renderSlipText(party));
+        const url = mode === "sms" ? `sms:${phone}?body=${message}` : `https://wa.me/${phone.replace("+", "")}?text=${message}`;
+        window.open(url, "_blank", "noopener,noreferrer");
+        toast(mode === "sms" ? "SMS app opened" : "WhatsApp opened");
+      }
+
+      function normalizePhone(value) {
+        const digits = String(value ?? "").replace(/\D/g, "");
+        if (!digits) return "";
+        if (digits.startsWith("92")) return "+" + digits;
+        if (digits.startsWith("0")) return "+92" + digits.slice(1);
+        return "+" + digits;
+      }
+
+      function paymentMethodUrdu(method) {
+        return {
+          Cash: "نقد",
+          Bank: "بینک",
+          "Bank Transfer": "بینک",
+          Easypaisa: "ایزی پیسہ",
+          JazzCash: "جاز کیش"
+        }[method] ?? method;
+      }
+
+      function emptySlipParty() {
+        return { partyType: "Customer", name: "-", phone: "", bill: 0, paid: 0, balance: 0, method: "Cash", itemName: "Pump / Repair Bill" };
+      }
+
+      function getSummary() {
+        const sales = data.sales.reduce((sum, item) => sum + num(item.total), 0);
+        const purchases = data.suppliers.reduce((sum, item) => sum + num(item.purchases), 0);
+        const receivable = data.customers.reduce((sum, item) => sum + num(item.balance), 0);
+        const payable = data.suppliers.reduce((sum, item) => sum + num(item.balance), 0);
+        const inventoryValue = data.inventory.reduce((sum, item) => sum + num(item.value), 0);
+        const profit = data.pumps.reduce((sum, item) => sum + num(item.sale) - num(item.cost), 0);
+        return {
+          sales,
+          purchases,
+          receivable,
+          payable,
+          inventoryValue,
+          profit,
+          ready: data.pumps.filter(item => item.status === "Ready").length,
+          pending: data.pumps.filter(item => item.status === "Pending").length,
+          lowStock: data.inventory.filter(item => num(item.stock) <= num(item.threshold)).length,
+          openInvoices: data.sales.filter(item => num(item.total) - num(item.paid) > 0).length
+        };
+      }
+
+      function fieldInput([key, label, type, value, options]) {
+        if (type === "select") {
+          return `<select name="${key}" aria-label="${escapeHtml(label)}">${options.map(option => `<option ${option === value ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select>`;
+        }
+        return `<input name="${key}" type="${type}" placeholder="${escapeHtml(label)}" value="${escapeHtml(value)}" ${key === "name" || key === "customer" ? "required" : ""}>`;
+      }
+
+      function metric(label, value) {
+        return `<article class="metric"><span>${escapeHtml(label)}</span><strong>${value}</strong></article>`;
+      }
+      function mini(label, value) {
+        return `<div class="mini"><span class="label">${escapeHtml(label)}</span><strong>${value}</strong></div>`;
+      }
+      function miniCard(title, value, detail) {
+        return `<article class="card"><div class="card-body">${mini(title, value)}<p style="margin-top:10px;color:var(--muted);font-size:13px">${escapeHtml(detail)}</p></div></article>`;
+      }
+      function customerProfile(customer) {
+        return [
+          mini("Customer", escapeHtml(customer.name)),
+          mini("Outstanding", money.format(num(customer.balance))),
+          mini("Total Sales", money.format(num(customer.sales))),
+          mini("Payments Received", money.format(num(customer.paid))),
+          mini("Pumps Purchased", num(customer.pumps)),
+          mini("Last Payment", escapeHtml(customer.lastPayment || "-"))
+        ].join("");
+      }
+      function statusBadge(value) {
+        const className = value === "Ready" || value === "Delivered" ? "ok" : value === "Pending" ? "bad" : "warn";
+        return badge(value, className);
+      }
+      function badge(label, className) {
+        return `<span class="status ${className}">${escapeHtml(label)}</span>`;
+      }
+      function toast(message) {
+        document.querySelector(".toast")?.remove();
+        const element = document.createElement("div");
+        element.className = "toast";
+        element.textContent = message;
+        document.body.append(element);
+        setTimeout(() => element.remove(), 2400);
+      }
+      function num(value) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      function nextNumber(value) {
+        return String(value).padStart(4, "0");
+      }
+      function emptyCustomer() {
+        return { name: "-", balance: 0, sales: 0, paid: 0, pumps: 0, lastPayment: "-" };
+      }
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+      }
+
+      render();
+    </script>
+  </body>
+</html>

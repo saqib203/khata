@@ -1,0 +1,116 @@
+erDiagram
+  users ||--o{ user_roles : has
+  roles ||--o{ user_roles : assigned
+  roles ||--o{ role_permissions : grants
+  permissions ||--o{ role_permissions : included
+  users ||--o{ device_sessions : owns
+
+  customers ||--o{ sales : buys
+  customers ||--o{ payments : makes
+  customers ||--o{ ledger_entries : has
+  customers ||--o{ pumps : owns
+
+  suppliers ||--o{ purchases : sells
+  suppliers ||--o{ payments : receives
+  suppliers ||--o{ ledger_entries : has
+
+  purchases ||--o{ purchase_items : contains
+  inventory_items ||--o{ purchase_items : purchased
+  inventory_items ||--o{ stock_transactions : moves
+  pumps ||--o{ pump_parts : uses
+  inventory_items ||--o{ pump_parts : consumed
+
+  sales ||--o{ sale_items : contains
+  sales ||--o{ payments : paid_by
+  sales ||--o{ ledger_entries : posts
+  pumps ||--o{ sale_items : sold_as
+
+  users {
+    uuid id PK
+    text email
+    text password_hash
+    text full_name
+    boolean is_active
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  customers {
+    uuid id PK
+    text customer_code
+    text name
+    text mobile_number
+    text whatsapp_number
+    text cnic
+    text address
+    text city
+    text status
+    timestamptz registered_at
+  }
+
+  suppliers {
+    uuid id PK
+    text supplier_code
+    text name
+    text contact_number
+    text whatsapp_number
+    text address
+    text city
+  }
+
+  inventory_items {
+    uuid id PK
+    text sku
+    text name
+    text category
+    numeric quantity_on_hand
+    numeric average_cost
+    numeric low_stock_threshold
+  }
+
+  pumps {
+    uuid id PK
+    text pump_code
+    text name
+    text pump_type
+    uuid customer_id FK
+    numeric labor_cost
+    numeric material_cost
+    numeric sale_price
+    text status
+  }
+
+  sales {
+    uuid id PK
+    text invoice_number
+    uuid customer_id FK
+    numeric subtotal
+    numeric discount
+    numeric total
+    numeric paid_amount
+    numeric balance_amount
+    text status
+  }
+
+  payments {
+    uuid id PK
+    uuid customer_id FK
+    uuid supplier_id FK
+    uuid sale_id FK
+    numeric amount
+    text method
+    text direction
+    timestamptz paid_at
+  }
+
+  ledger_entries {
+    uuid id PK
+    uuid customer_id FK
+    uuid supplier_id FK
+    uuid sale_id FK
+    numeric debit
+    numeric credit
+    numeric balance_after
+    text source_type
+    uuid source_id
+  }
