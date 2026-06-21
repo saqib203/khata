@@ -5,13 +5,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#172026",
-        mist: "#f4f6f8",
-        line: "#d9dee5",
-        brand: "#1769aa",
-        success: "#14845c",
-        warning: "#b7791f",
-        danger: "#b42318"
+        ink: "#071118",
+        night: "#0b1720",
+        roast: "#2b1712",
+        mist: "#102b36",
+        panel: "#0f2530",
+        line: "#1f4b58",
+        brand: "#27d3e8",
+        aqua: "#8cecff",
+        foam: "#d8fbff",
+        bean: "#7a3f2b",
+        success: "#20d89b",
+        warning: "#f2b85b",
+        danger: "#ff6b61"
       }
     }
   },

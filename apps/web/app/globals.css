@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --background: #f4f6f8;
-  --foreground: #172026;
+  color-scheme: dark;
+  --background: #071118;
+  --foreground: #d8fbff;
 }
 
 * {
@@ -14,7 +14,10 @@
 
 body {
   margin: 0;
-  background: var(--background);
+  background:
+    radial-gradient(circle at 72% 15%, rgba(39, 211, 232, 0.26), transparent 28rem),
+    radial-gradient(circle at 18% 86%, rgba(122, 63, 43, 0.32), transparent 24rem),
+    linear-gradient(135deg, #071118 0%, #0b1720 44%, #09313f 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
